@@ -178,6 +178,7 @@
   <ol>
     <li *ngFor="let activity of activities$ | async">
       {{ activity.title }} - {{ activity.duration }} hours
+      <button type="button" (click)="removeActivity(activity.id)">Delete Activity</button>
     </li>
   </ol>
 
@@ -193,6 +194,17 @@
     </select> -->
     <button type="submit">Add Activity</button>
   </form>
+
+  <!-- update form -->
+  <form (ngSubmit)="updateActivity(activity)" *ngFor="let activity of activities$ | async">
+    <input type="text" [(ngModel)]="activity.title" name="title" placeholder="Title" required />
+    <input type="number" [(ngModel)]="activity.duration" name="duration" placeholder="Duration (hours)" required />
+    <label for="">{{activity.date | date:'dd/MM/yyyy'}}</label>
+    <input type="date" [(ngModel)]="activity.date" name="date" required />
+    <input type="number" [(ngModel)]="activity.categoryId" name="categoryId" placeholder="Category ID" required />
+    <button type="submit">Update Activity</button>
+  </form>
+
 </main>
 
 
