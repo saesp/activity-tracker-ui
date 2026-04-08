@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Activity, CreateActivity, UpdateActivity } from '../models/activity.model';
+import { Activity, ActivityCreate, ActivityUpdate } from '../models/activity.model';
 
 //Service responsabile delle chiamate HTTP verso l'API Activities
 
@@ -20,12 +20,12 @@ export class ActivityService { //this is the service that will be used to intera
   }
 
   //POST-CREATE
-  postActivity(activity: CreateActivity) {
+  postActivity(activity: ActivityCreate) {
     return this.http.post<Activity>(this.apiUrl, activity);
   }
 
   //PUT-UPDATE
-  putActivity(activity: UpdateActivity) {
+  putActivity(activity: ActivityUpdate) {
     return this.http.put<Activity>(`${this.apiUrl}/${activity.id}`, activity);
   }
 

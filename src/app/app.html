@@ -175,36 +175,77 @@
 
 <main class="main">
   <h1>Activities</h1>
-  <ol>
+  <ul>
     <li *ngFor="let activity of activities$ | async">
-      {{ activity.title }} - {{ activity.duration }} hours
+      {{ activity.id }} - {{ activity.title }} - {{ activity.duration }} - {{ activity.createdAt |
+      date:'dd/MM/yyyy HH:mm:ss' }}
+      hours
       <button type="button" (click)="removeActivity(activity.id)">Delete Activity</button>
     </li>
-  </ol>
+  </ul>
 
   <!-- Create a new activity -->
-  <form (ngSubmit)="createActivity()">
-    <input type="text" [(ngModel)]="newActivity.title" name="title" placeholder="Title" required />
-    <input type="number" [(ngModel)]="newActivity.duration" name="duration" placeholder="Duration (hours)" required />
-    <input type="date" [(ngModel)]="newActivity.date" name="date" required />
+  <form #form="ngForm" (ngSubmit)="createActivity(form)" novalidate>
+    <!-- title -->
+    <input type="text" [(ngModel)]="newActivity.title" name="title" placeholder="Title" required minlength="1"
+      maxlength="255" #title="ngModel" />
+    <div *ngIf="title.invalid && title.touched" class="error-messages">
+      <small *ngIf="title.errors?.['required']">Title is required</small>
+      <small *ngIf="title.errors?.['minlength']">Min 1 character</small>
+      <small *ngIf="title.errors?.['maxlength']">Max 255 characters</small>
+    </div>
+
+    <!-- Duration -->
+    <input type="number" [(ngModel)]="newActivity.duration" name="duration" placeholder="Duration (hours)" required
+      min="1" max="24" #duration="ngModel" />
+    <div *ngIf="duration.invalid && duration.touched" class="error-messages">
+      <small *ngIf="duration.errors?.['required']">Duration is required</small>
+      <small *ngIf="duration.errors?.['min']">Min 1 hour</small>
+      <small *ngIf="duration.errors?.['max']">Max 24 hours</small>
+    </div>
+
+    <!-- DATE -->
+    <input type="date" [(ngModel)]="newActivity.date" name="date" placeholder="Date" required #date="ngModel" />
+    <div *ngIf="date.invalid && date.touched" class="error-messages">
+      <small *ngIf="date.errors?.['required']">Date is required</small>
+    </div>
+
     <input type="number" [(ngModel)]="newActivity.categoryId" name="categoryId" placeholder="Category ID" required />
     <!-- <select [(ngModel)]="newActivity.categoryId" name="categoryId" required>
       <option value="" disabled selected>Select category</option>
       <option *ngFor="let category of categories$ | async" [value]="category.id">{{ category.name }}</option>
     </select> -->
-    <button type="submit">Add Activity</button>
+    <button type="submit" [disabled]="form.invalid">Add Activity</button>
   </form>
 
   <!-- update form -->
-  <form (ngSubmit)="updateActivity(activity)" *ngFor="let activity of activities$ | async">
-    <input type="text" [(ngModel)]="activity.title" name="title" placeholder="Title" required />
-    <input type="number" [(ngModel)]="activity.duration" name="duration" placeholder="Duration (hours)" required />
-    <label for="">{{activity.date | date:'dd/MM/yyyy'}}</label>
-    <input type="date" [(ngModel)]="activity.date" name="date" required />
-    <input type="number" [(ngModel)]="activity.categoryId" name="categoryId" placeholder="Category ID" required />
-    <button type="submit">Update Activity</button>
-  </form>
+  <form #form="ngForm" (ngSubmit)="updateActivity(activity)" novalidate *ngFor="let activity of activities$ | async">
 
+    <input type="text" [(ngModel)]="activity.title" name="title" placeholder="Title" required minlength="1"
+      maxlength="255" #title="ngModel" />
+    <div *ngIf="title.invalid && title.touched" class="error-messages">
+      <small *ngIf="title.errors?.['required']">Title is required</small>
+      <small *ngIf="title.errors?.['minlength']">Min 1 character</small>
+      <small *ngIf="title.errors?.['maxlength']">Max 255 characters</small>
+    </div>
+
+    <input type="number" [(ngModel)]="activity.duration" name="duration" placeholder="Duration (hours)" required min="1"
+      max="24" #duration="ngModel" />
+    <div *ngIf="duration.invalid && duration.touched" class="error-messages">
+      <small *ngIf="duration.errors?.['required']">Duration is required</small>
+      <small *ngIf="duration.errors?.['min']">Min 1 hour</small>
+      <small *ngIf="duration.errors?.['max']">Max 24 hours</small>
+    </div>
+
+    <label for="date">{{activity.date | date:'dd/MM/yyyy'}}</label>
+    <input type="date" [(ngModel)]="activity.date" name="date" required #date="ngModel" />
+    <div *ngIf="date.invalid && date.touched" class="error-messages">
+      <small *ngIf="date.errors?.['required']">Date is required</small>
+    </div>
+
+    <input type="number" [(ngModel)]="activity.categoryId" name="categoryId" placeholder="Category ID" required />
+    <button type="submit" [disabled]="form.invalid">Update Activity</button>
+  </form>
 </main>
 
 

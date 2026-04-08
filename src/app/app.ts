@@ -2,8 +2,9 @@ import { Component } from '@angular/core';
 import { ActivityService } from './services/activity.service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { inject } from '@angular/core';
-import { Activity, CreateActivity, UpdateActivity } from './models/activity.model';
+import { Activity, ActivityCreate, ActivityUpdate } from './models/activity.model';
 import { FormsModule } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 // componente principale:
 // -richiama il service
@@ -23,39 +24,45 @@ export class App {
   constructor() { }
 
   //READ
-  activities$ = this.activityService.getActivities();
+  activities$!: Observable<Activity[]>;
+  loadActivities() {
+    this.activities$ = this.activityService.getActivities();
+  }
+  ngOnInit() {
+    this.loadActivities();
+  }
 
   //CREATE
-  newActivity: CreateActivity = {
+  newActivity: ActivityCreate = {
     title: '',
     duration: 0,
     date: '',
-    categoryId: 0,
-    createdAt: new DatePipe('en-US').transform(new Date(), 'yyyy-MM-ddTHH:mm:ss')!
+    categoryId: 0
   };
-  createActivity() {
+  createActivity(form: any) {
     this.activityService.postActivity(this.newActivity).subscribe({
-      next: (res) => {
-        console.log('Activity created:', res);
-        this.activities$ = this.activityService.getActivities(); //aggiorna lista delle attività dopo la creazione
+      next: () => {
+        alert('Activity created successfully! ✅');
+        form.resetForm();
+        this.loadActivities();
       },
       error: (err) => {
-        console.error('FULL ERROR:', err);
-        console.log('Backend says:', err.error);
+        console.error('Full error:', err);
+        alert('Error creating activity! ❌');
       }
     });
   }
 
   //UPDATE
-  updateActivity(activity: Activity) {
+  updateActivity(activity: ActivityUpdate) {
     this.activityService.putActivity(activity).subscribe({
-      next: (res) => {
-        console.log('Activity updated:', res);
-        this.activities$ = this.activityService.getActivities();
+      next: () => {
+        alert('Activity updated successfully! ✅');
+        this.loadActivities();
       },
       error: (err) => {
-        console.error('FULL ERROR:', err);
-        console.log('Backend says:', err.error);
+        console.error('Full error:', err);
+        alert('Error updating activity! ❌');
       }
     });
   }
@@ -64,12 +71,12 @@ export class App {
   removeActivity(id: number) {
     this.activityService.deleteActivity(id).subscribe({
       next: () => {
-        console.log('Activity deleted');
-        this.activities$ = this.activityService.getActivities();
+        alert('Activity deleted successfully! ✅');
+        this.loadActivities();
       },
       error: (err) => {
-        console.error('FULL ERROR:', err);
-        console.log('Backend says:', err.error);
+        console.error('Full error:', err);
+        alert('Error deleting activity! ❌');
       }
     });
   }
