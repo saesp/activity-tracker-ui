@@ -26,6 +26,15 @@ export class App {
   private activityService = inject(ActivityService);
   private categoryService = inject(CategoryService);
 
+  //feedback for create, update and delete
+  showMessage(msg: string, type: 'success' | 'error' = 'success') {
+    this.message = msg;
+    this.messageType = type;
+    setTimeout(() => {
+      this.message = '';
+    }, 3000);
+  }
+
   constructor() { }
 
   // ACTIVITIES
@@ -45,6 +54,11 @@ export class App {
 
   //null = create mode, Value = edit mode
   editingActivity: ActivityUpdate | null = null;
+
+  loading: boolean = false;
+  message: string = '';
+  messageType: 'success' | 'error' = 'success';
+
 
   //Button Edit (create mode -> edit mode)
   updateActivity(activity: ActivityUpdate) {
@@ -75,27 +89,31 @@ export class App {
         id: this.editingActivity.id,
         ...this.newActivity
       };
+      this.loading = true;
       this.activityService.putActivity(updated).subscribe({
         next: () => {
-          alert('Activity updated successfully! ✏️');
+          this.showMessage('Activity updated successfully! ✅');
+          this.loading = false;
           this.resetForm(form);
         },
         error: (err) => {
-          console.error('Full error:', err);
-          alert('Error updating activity! ❌');
+          this.showMessage('Error updating activity! ❌', 'error');
+          this.loading = false;
         }
       });
 
     } else { //if it's in create mode
       //CREATE
+      this.loading = true;
       this.activityService.postActivity(this.newActivity).subscribe({
         next: () => {
-          alert('Activity created successfully! ✅');
+          this.showMessage('Activity created successfully! ✅');
+          this.loading = false;
           this.resetForm(form);
         },
         error: (err) => {
-          console.error('Full error:', err);
-          alert('Error creating activity! ❌');
+          this.showMessage('Error creating activity! ❌', 'error');
+          this.loading = false;
         }
       });
     }
@@ -107,27 +125,20 @@ export class App {
 
     this.editingActivity = null;
 
-    // this.newActivity = {
-    //   title: '',
-    //   duration: null as any,
-    //   date: '',
-    //   categoryId: null as any
-    // };
-
     this.loadActivities();
   }
 
 
   // === DELETE ===
   removeActivity(id: number) {
+    const confirmed = confirm("Are you sure want to delete this activity?");
+
+    if (!confirmed) return;
+
     this.activityService.deleteActivity(id).subscribe({
       next: () => {
-        alert('Activity deleted successfully! 🗑️');
+        this.showMessage('Activity deleted successfully! 🗑️');
         this.loadActivities();
-      },
-      error: (err) => {
-        console.error('Full error:', err);
-        alert('Error deleting activity! ❌');
       }
     });
   }

@@ -1,15 +1,18 @@
 <header>
   <h1>Monitora le tue attività</h1>
+
+  <div *ngIf="loading">Loading...</div>
+  <div *ngIf="message" [ngClass]="messageType">{{message}}</div>
 </header>
 
 <main class="main">
   <section>
-    <h2>Le tue attività</h2>
+    <h2>Le attività di oggi</h2>
     <ul>
       <li *ngFor="let activity of activities$ | async">
-        {{ activity.id }} - {{ activity.title }} - {{ activity.duration }} - {{ activity.createdAt |
+        {{ activity.title }} - {{ activity.duration }} hours - {{ activity.createdAt |
         date:'dd/MM/yyyy HH:mm:ss' }} - {{activity.categoryName}}
-        hours
+
         <button type="button" (click)="removeActivity(activity.id)">Delete</button>
         <button type="button" (click)="updateActivity(activity)">Edit</button>
       </li>
@@ -21,6 +24,7 @@
 
     <!-- Create/Update a new activity -->
     <form #form="ngForm" (ngSubmit)="saveActivity(form)" novalidate>
+
       <!-- Title -->
       <input type="text" [(ngModel)]="newActivity.title" name="title" placeholder="Title" required minlength="1"
         maxlength="255" #title="ngModel" />
